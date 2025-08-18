@@ -11,14 +11,14 @@ protected:
     double balance;
 
 public:
-    BankAccount(int accNo, string name, double bal = 0)   // Constructor
+    BankAccount(int accNo, string name, double bal = 0) // Constructor
         : accountNumber(accNo), accountHolderName(name), balance(bal)
-    {}
+    {
+    }
 
-    virtual void deposit(double amount)  // Deposit Method
+    virtual void deposit(double amount) // Deposit Method
     {
         balance += amount;
-        cout << "Deposited: " << amount << " New Balance: " << balance << endl;
     }
 
     virtual void withdraw(double amount) // Withdraw Method
@@ -26,7 +26,6 @@ public:
         if (amount <= balance)
         {
             balance -= amount;
-            cout << "Withdrawn: " << amount << " New Balance: " << balance << endl;
         }
         else
         {
@@ -36,7 +35,7 @@ public:
 
     double getBalance() const { return balance; } // Balance Getter
 
-    virtual void displayAccountInfo() const
+    virtual void displayAccountInfo() const // account info display 
     {
         cout << "Account Number: " << accountNumber << endl
              << "Account Holder: " << accountHolderName << endl
@@ -76,14 +75,15 @@ class CheckingAccount : public BankAccount
 
 public:
     CheckingAccount(int accNo, string name, double bal, double limit) // Constructor
-        : BankAccount(accNo, name, bal), overdraftLimit(limit) {}
+        : BankAccount(accNo, name, bal), overdraftLimit(limit)
+    {
+    }
 
     void withdraw(double amount) // Overload withdraw method
     {
         if (amount <= balance + overdraftLimit)
         {
             balance -= amount; // Withdraw from balance
-            cout << "Withdrawn: " << amount << " New Balance: " << balance << endl;
         }
         else
         {
@@ -94,14 +94,16 @@ public:
 
 // Derived Class - Fixed Deposit Account
 
-class FixedDepositAccount : public BankAccount 
+class FixedDepositAccount : public BankAccount
 {
     int duration; // in months
     double interestRate;
 
 public:
     FixedDepositAccount(int accNo, string name, double bal, int dur, double rate) // Constructor
-        : BankAccount(accNo, name, bal), duration(dur), interestRate(rate) {}
+        : BankAccount(accNo, name, bal), duration(dur), interestRate(rate)
+    {
+    }
 
     void calculateInterest() // Fixed Deposit Account Interest Calculation
     {
@@ -113,13 +115,52 @@ public:
 // Main Menu
 int main()
 {
-    SavingsAccount sa(101, "Prachi", 5000, 4);  // 4% interest
-    CheckingAccount ca(102, "Sakshi", 2000, 1000); // overdraft limit of 1000
-    FixedDepositAccount fda(103, "Dhara", 10000, 3, 4);  // 3 months, 4% interest
+    int accNo, duration, overdraftLimit;
+    string name;
+    double bal, rate;
+    int choice, accType;
+    double amount;
 
-    BankAccount *accounts[] = {&sa, &ca, &fda}; // Array of BankAccount pointers
-    int choice, accType; 
-    double amount; // Variable to store amount
+    cout << "Enter Account details:" << endl;
+    cout << "Account Number: ";
+    cin >> accNo;
+    cout << "Account Holder Name: ";
+    cin >> name;
+    cout << "Initial Balance: ";
+    cin >> bal;
+
+    cout << "Select Account Type: " << endl;
+    cout << "Select Account (0: Savings, 1: Checking, 2: Fixed Deposit): " << endl;
+    cout << "Enter choice: ";
+    cin >> accType;
+
+    BankAccount *account = nullptr;
+
+    if (accType == 0)
+    {
+        cout << "Interest Rate (%): ";
+        cin >> rate;
+        account = new SavingsAccount(accNo, name, bal, rate);
+    }
+    else if (accType == 1)
+    {
+        cout << "Overdraft Limit: ";
+        cin >> overdraftLimit;
+        account = new CheckingAccount(accNo, name, bal, overdraftLimit);
+    }
+    else if (accType == 2)
+    {
+        cout << "Duration (in months): ";
+        cin >> duration;
+        cout << "Interest Rate (%): ";
+        cin >> rate;
+        account = new FixedDepositAccount(accNo, name, bal, duration, rate);
+    }
+    else
+    {
+        cout << "Invalid Account Type!" << endl;
+        return 0;
+    }
 
     do
     {
@@ -131,34 +172,33 @@ int main()
         if (choice == 0)
             break;
 
-        cout << "Select Account (0: Savings, 1: Checking, 2: Fixed Deposit): ";
-        cin >> accType;
-
         switch (choice)
         {
         case 1:
             cout << "Enter amount to deposit: ";
             cin >> amount;
-            accounts[accType]->deposit(amount);
+            account->deposit(amount);
             break;
         case 2:
             cout << "Enter amount to withdraw: ";
             cin >> amount;
-            accounts[accType]->withdraw(amount);
+            account->withdraw(amount);
             break;
         case 3:
-            accounts[accType]->displayAccountInfo();
+            account->displayAccountInfo();
             break;
         case 4:
-            accounts[accType]->calculateInterest();
+            account->calculateInterest();
             break;
         default:
             cout << "Invalid choice!" << endl;
         }
     } while (choice != 0);
 
+    delete account; // clean up
     return 0;
 }
+
 /* output : -
 
    --- Banking System Menu ---
@@ -175,7 +215,7 @@ Select Account (0: Savings, 1: Checking, 2: Fixed Deposit): 0
 
 Enter amount to deposit: 3000
 
-Deposited: 3000 New Balance: 8000 
+Deposited: 3000 New Balance: 8000
 
 ------------------------------------------------------------------
 
@@ -185,7 +225,7 @@ Select Account (0: Savings, 1: Checking, 2: Fixed Deposit): 1
 
 Enter amount to withdraw: 500
 
-Withdrawn: 500 New Balance: 1500 
+Withdrawn: 500 New Balance: 1500
 
 ------------------------------------------------------------------
 
@@ -195,7 +235,7 @@ Select Account (0: Savings, 1: Checking, 2: Fixed Deposit): 1
 
 Enter amount to withdraw: 8000
 
-Overdraft limit exceeded! 
+Overdraft limit exceeded!
 
 ------------------------------------------------------------------
 
@@ -207,7 +247,7 @@ Account Number: 103
 
 Account Holder: Dhara
 
-Balance: 10000 
+Balance: 10000
 
 ------------------------------------------------------------------
 
