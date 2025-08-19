@@ -35,7 +35,7 @@ public:
 
     double getBalance() const { return balance; } // Balance Getter
 
-    virtual void displayAccountInfo() const // account info display 
+    virtual void displayAccountInfo() const // account info display
     {
         cout << "Account Number: " << accountNumber << endl
              << "Account Holder: " << accountHolderName << endl
@@ -115,146 +115,231 @@ public:
 // Main Menu
 int main()
 {
-    int accNo, duration, overdraftLimit;
-    string name;
-    double bal, rate;
-    int choice, accType;
-    double amount;
+    int accNum;
+    string accName;
+    double balance;
 
-    cout << "Enter Account details:" << endl;
+    cout << "Enter details for Savings Account:\n";
     cout << "Account Number: ";
-    cin >> accNo;
+    cin >> accNum;
     cout << "Account Holder Name: ";
-    cin >> name;
+    cin >> accName;
     cout << "Initial Balance: ";
-    cin >> bal;
+    cin >> balance;
+    double sRate;
+    cout << "Interest Rate (%): ";
+    cin >> sRate;
+    SavingsAccount sa(accNum, accName, balance, sRate);
 
-    cout << "Select Account Type: " << endl;
-    cout << "Select Account (0: Savings, 1: Checking, 2: Fixed Deposit): " << endl;
-    cout << "Enter choice: ";
-    cin >> accType;
+    cout << "\nEnter details for Checking Account:\n";
+    cout << "Account Number: ";
+    cin >> accNum;
+    cout << "Account Holder Name: ";
+    cin >> accName;
+    cout << "Initial Balance: ";
+    cin >> balance;
+    double limit;
+    cout << "Overdraft Limit: ";
+    cin >> limit;
+    CheckingAccount ca(accNum, accName, balance, limit);
 
-    BankAccount *account = nullptr;
+    cout << "\nEnter details for Fixed Deposit Account:\n";
+    cout << "Account Number: ";
+    cin >> accNum;
+    cout << "Account Holder Name: ";
+    cin >> accName;
+    cout << "Initial Balance: ";
+    cin >> balance;
+    int term;
+    double fRate;
+    cout << "Term (in months): ";
+    cin >> term;
+    cout << "Interest Rate (%): ";
+    cin >> fRate;
+    FixedDepositAccount fda(accNum, accName, balance, term, fRate);
 
-    if (accType == 0)
-    {
-        cout << "Interest Rate (%): ";
-        cin >> rate;
-        account = new SavingsAccount(accNo, name, bal, rate);
-    }
-    else if (accType == 1)
-    {
-        cout << "Overdraft Limit: ";
-        cin >> overdraftLimit;
-        account = new CheckingAccount(accNo, name, bal, overdraftLimit);
-    }
-    else if (accType == 2)
-    {
-        cout << "Duration (in months): ";
-        cin >> duration;
-        cout << "Interest Rate (%): ";
-        cin >> rate;
-        account = new FixedDepositAccount(accNo, name, bal, duration, rate);
-    }
-    else
-    {
-        cout << "Invalid Account Type!" << endl;
-        return 0;
-    }
+    BankAccount *accounts[] = {&sa, &ca, &fda};
+    int choice, accTypes;
 
     do
     {
-        cout << "--- Banking System Menu --- " << endl;
-        cout << "1. Deposit " << endl << "2. Withdraw " << endl << "3. Display Info" << endl << "4. Calculate Interest" << endl << "0. Exit " << endl;
-        cout << "Enter choice: ";
+        cout << "---- Banking System Menu ----" << endl;
+        cout << "1. Deposit" << endl;
+        cout << "2. Withdraw" << endl;
+        cout << "3. Display Account Info" << endl;
+        cout << "4. Calculate Interest" << endl;
+        cout << "0. Exit" << endl;
+
+        cout << " Enter your choice: ";
         cin >> choice;
+        int amount;
 
         if (choice == 0)
             break;
+
+        cout << "Select Account (0: Saving, 1: Checking, 2: Fixed Deposit):";
+        cin >> accTypes;
 
         switch (choice)
         {
         case 1:
             cout << "Enter amount to deposit: ";
             cin >> amount;
-            account->deposit(amount);
+            accounts[accTypes]->deposit(amount);
             break;
+
         case 2:
             cout << "Enter amount to withdraw: ";
             cin >> amount;
-            account->withdraw(amount);
+            accounts[accTypes]->withdraw(amount);
             break;
+
         case 3:
-            account->displayAccountInfo();
+            accounts[accTypes]->displayAccountInfo();
             break;
+
         case 4:
-            account->calculateInterest();
+            accounts[accTypes]->calculateInterest();
             break;
+
         default:
-            cout << "Invalid choice!" << endl;
+            cout << "Invalid choice" << endl;
         }
+
     } while (choice != 0);
 
-    delete account; // clean up
     return 0;
 }
+/*output  :---
 
-/* output : -
+Enter details for Savings Account:
+Account Number: 123
+Account Holder Name: prachi
+Initial Balance: 50000
+Interest Rate (%): 4
 
-   --- Banking System Menu ---
+Enter details for Checking Account:
+Account Number: 124
+Account Holder Name: sakshi
+Initial Balance: 60000
+Overdraft Limit: 3000
 
+Enter details for Fixed Deposit Account:
+Account Number: 125
+Account Holder Name: palak
+Initial Balance: 80000
+Term (in months): 3
+Interest Rate (%): 4
+---- Banking System Menu ----
 1. Deposit
 2. Withdraw
-3. Display Info
+3. Display Account Info
 4. Calculate Interest
 0. Exit
-
----->> Enter choice: 1
-
-Select Account (0: Savings, 1: Checking, 2: Fixed Deposit): 0
-
-Enter amount to deposit: 3000
-
-Deposited: 3000 New Balance: 8000
-
-------------------------------------------------------------------
-
----->> Enter choice: 2
-
-Select Account (0: Savings, 1: Checking, 2: Fixed Deposit): 1
-
-Enter amount to withdraw: 500
-
-Withdrawn: 500 New Balance: 1500
-
-------------------------------------------------------------------
-
----->> Enter choice: 2
-
-Select Account (0: Savings, 1: Checking, 2: Fixed Deposit): 1
-
-Enter amount to withdraw: 8000
-
-Overdraft limit exceeded!
-
-------------------------------------------------------------------
-
----->> Enter choice: 3
-
-Select Account (0: Savings, 1: Checking, 2: Fixed Deposit): 2
-
-Account Number: 103
-
-Account Holder: Dhara
-
-Balance: 10000
-
-------------------------------------------------------------------
-
----->> Enter choice: 4
-
-Select Account (0: Savings, 1: Checking, 2: Fixed Deposit): 2
-
-FD Interest: 100  // ->>  10,000 * 4 * 3 / (12 * 100) = 1,20,000 / 1,200 //
-
+ Enter your choice: 1
+Select Account (0: Saving, 1: Checking, 2: Fixed Deposit):0
+Enter amount to deposit: 2000 
+---- Banking System Menu ----
+1. Deposit
+2. Withdraw
+3. Display Account Info
+4. Calculate Interest
+0. Exit
+ Enter your choice: 2
+Select Account (0: Saving, 1: Checking, 2: Fixed Deposit):0
+Enter amount to withdraw: 1000
+---- Banking System Menu ----
+1. Deposit
+2. Withdraw
+3. Display Account Info
+4. Calculate Interest
+0. Exit
+ Enter your choice: 3
+Select Account (0: Saving, 1: Checking, 2: Fixed Deposit):0
+Account Number: 123
+Account Holder: prachi
+Balance: 51000
+---- Banking System Menu ----
+1. Deposit
+2. Withdraw
+3. Display Account Info
+4. Calculate Interest
+0. Exit
+ Enter your choice: 4
+Select Account (0: Saving, 1: Checking, 2: Fixed Deposit):0
+Interest: 2040
+---- Banking System Menu ----
+1. Deposit
+2. Withdraw
+3. Display Account Info
+4. Calculate Interest
+0. Exit
+ Enter your choice: 2
+Select Account (0: Saving, 1: Checking, 2: Fixed Deposit):1
+Enter amount to withdraw: 2000
+---- Banking System Menu ----
+1. Deposit
+2. Withdraw
+3. Display Account Info
+4. Calculate Interest
+0. Exit
+ Enter your choice: 1
+Select Account (0: Saving, 1: Checking, 2: Fixed Deposit):1
+Enter amount to deposit: 5000
+---- Banking System Menu ----
+1. Deposit
+2. Withdraw
+3. Display Account Info
+4. Calculate Interest
+0. Exit
+ Enter your choice: 3
+Select Account (0: Saving, 1: Checking, 2: Fixed Deposit):1
+Account Number: 124
+Account Holder: sakshi
+Balance: 63000
+---- Banking System Menu ----
+1. Deposit
+2. Withdraw
+3. Display Account Info
+4. Calculate Interest
+0. Exit
+ Enter your choice: 1
+Select Account (0: Saving, 1: Checking, 2: Fixed Deposit):2
+Enter amount to deposit: 5000
+---- Banking System Menu ----
+1. Deposit
+2. Withdraw
+3. Display Account Info
+4. Calculate Interest
+0. Exit
+ Enter your choice: 2
+Select Account (0: Saving, 1: Checking, 2: Fixed Deposit):2
+Enter amount to withdraw: 6000
+---- Banking System Menu ----
+1. Deposit
+2. Withdraw
+3. Display Account Info
+4. Calculate Interest
+0. Exit
+ Enter your choice: 3
+Select Account (0: Saving, 1: Checking, 2: Fixed Deposit):2
+Account Number: 125
+Account Holder: palak
+Balance: 79000
+---- Banking System Menu ----
+1. Deposit
+2. Withdraw
+3. Display Account Info
+4. Calculate Interest
+0. Exit
+ Enter your choice: 4
+Select Account (0: Saving, 1: Checking, 2: Fixed Deposit):2
+FD Interest: 790
+---- Banking System Menu ----
+1. Deposit
+2. Withdraw
+3. Display Account Info
+4. Calculate Interest
+0. Exit
+ Enter your choice: 0
 */
